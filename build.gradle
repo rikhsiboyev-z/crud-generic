@@ -3,9 +3,22 @@ plugins {
     id 'org.springframework.boot' version '3.2.1'
     id 'io.spring.dependency-management' version '1.1.4'
 }
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
 
-group = 'org.example'
-version = '0.0.1-SNAPSHOT'
+
+group = 'io.github.egoiste'
+version = '1.1.1'
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+sourceCompatibility = 1.8
 
 java {
     sourceCompatibility = '17'
@@ -15,10 +28,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -35,4 +44,69 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications{
+
+        mavenJava(MavenPublication){
+
+            groupId = 'io.github.egoiste'
+            artifactId = 'crud-generics'
+            version = '1.1.1'
+            from components.java
+
+            pom {
+                name = 'crud-generics'
+                url = 'https://github.com/rikhsiboyev-z/crud-generic'
+                inceptionYear = '2024'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'zaxa'
+                        name = 'Rikxsiboyev Zayniddin'
+                        email = 'rikhsiboyevzaxa@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git:github.com/rikhsiboyev-z/crud-generic.git'
+                    developerConnection = 'scm:git:ssh://github.com/rikhsiboyev-z/crud-generic.git'
+                    url = 'https://github.com/rikhsiboyev-z/crud-generic'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = project.properties["ossrhUsername"]
+                password = project.properties["ossrhPassword"]
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
